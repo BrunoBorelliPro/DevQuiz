@@ -1,43 +1,50 @@
 import 'package:dev_quiz/challenge/widgets/awnser_widget/awnser_widget.dart';
 import 'package:dev_quiz/core/app_text_styles.dart';
+import 'package:dev_quiz/shared/models/awnser_model.dart';
+import 'package:dev_quiz/shared/models/question_model.dart';
 import 'package:flutter/material.dart';
 
-class QuizWidget extends StatelessWidget {
-  final String title;
-  const QuizWidget({Key? key, required this.title}) : super(key: key);
+class QuizWidget extends StatefulWidget {
+  final QuestionModel question;
+  final VoidCallback onChange;
+  const QuizWidget({Key? key, required this.question, required this.onChange})
+      : super(key: key);
+
+  @override
+  _QuizWidgetState createState() => _QuizWidgetState();
+}
+
+class _QuizWidgetState extends State<QuizWidget> {
+  int indexSelected = -1;
+
+  AwnserModel awnser(int index) => widget.question.awnsers[index];
+
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
-            title,
+            widget.question.title,
             style: AppTextStyles.heading,
           ),
           SizedBox(
             height: 24,
           ),
-          AwnserWidget(
-            isRight: true,
-            title:
-                "Possibilita a criação de aplicativos compilados nativamente",
-            isSelected: true,
-          ),
-          AwnserWidget(
-            title:
-                "Possibilita a criação de aplicativos compilados nativamente",
-            isSelected: false,
-          ),
-          AwnserWidget(
-            title:
-                "Possibilita a criação de aplicativos compilados nativamente",
-            isSelected: false,
-          ),
-          AwnserWidget(
-            title:
-                "Possibilita a criação de aplicativos compilados nativamente",
-            isSelected: false,
-          ),
+          for (var i = 0; i < widget.question.awnsers.length; i++)
+            AwnserWidget(
+              awnser: awnser(i),
+              disabled: indexSelected != -1,
+              isSelected: indexSelected == i,
+              onTap: () {
+                indexSelected = i;
+
+                setState(() {});
+                Future.delayed(Duration(milliseconds: 500))
+                    .then((value) => widget.onChange());
+              },
+            )
         ],
       ),
     );
